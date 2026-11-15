@@ -2,6 +2,15 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
+    options {
+        skipDef
+        aultCheckout(true)
+    }
+
     environment {
         DOCKER_IMAGE = 'kumaresansoundappan/kanban-dashboard'
     }
