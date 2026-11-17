@@ -144,7 +144,7 @@ pipeline {
         }
 
         always {
-            sh 'docker logout || true'
+            sh 'docker logout || true
         }
     }
 }
