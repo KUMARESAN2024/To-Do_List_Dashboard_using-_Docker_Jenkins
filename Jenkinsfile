@@ -60,4 +60,57 @@ pipeline {
             echo 'Pipeline failed. Check the console output.'
         }
     }
+
+    stage('Health Check & Validation') {
+    steps {
+        sh '''
+            set -e
+
+            CONTAINER="kanban-dashboard"
+
+            echo "Checking container status..."
+
+            RUNNING=$(docker inspect \
+                -f '{{.State.Running}}' "$CONTAINER")
+
+            if [ "$RUNNING" != "true" ]; then
+                echo "Container is not running"
+                exit 1
+            fi
+
+            echo "Checking Docker health..."
+
+            for i in $(seq 1 12); do
+                STATUS=$(docker inspect \
+                    -f '{{.State.Health.Status}}' "$CONTAINER")
+
+                echo "Health: $STATUS"
+
+                if [ "$STATUS" = "healthy" ]; then
+                    break
+                fi
+
+                if [ "$STATUS" = "unhealthy" ]; then
+                    docker logs "$CONTAINER"
+                    exit 1
+                fi
+
+                if [ "$i" -eq 12 ]; then
+                    echo "Health check timeout"
+                    exit 1
+                fi
+
+                sleep 5
+            done
+
+            echo "Checking application response..."
+
+            curl --fail --silent --show-error \
+                http://localhost:8081/ \
+                -o /dev/null
+
+            echo "Application is responding successfully"
+        '''
+    }
+}
 }
