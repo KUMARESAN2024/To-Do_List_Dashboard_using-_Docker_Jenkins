@@ -360,7 +360,6 @@ Capture the following evidence for project demonstration or evaluation:
 - Container CPU and memory limits.
 - Jenkins pass and fail build console outputs.
 - Docker logs and inspection output.
-- Rollback evidence, if implemented and tested.
 
 ## Troubleshooting
 
